@@ -10,9 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_06_20_192909) do
+ActiveRecord::Schema.define(version: 2019_06_20_203908) do
 
-  create_table "batchs", force: :cascade do |t|
+  create_table "batches", force: :cascade do |t|
     t.string "reference"
     t.string "purchaseChannel"
     t.text "orders"
