@@ -6,6 +6,9 @@ class BatchesController < ApplicationController
     end
     def show
         batch = Batch.find(params[:id])
+        if !params[:id]
+            render json: {status: 'SUCCESS', message:'Batch was not found', data: false}, status: :ok
+        end
         render json: {status: 'SUCCESS', message:'Batch information', data: batch},status: :ok
     end
     def create # Create a Batch
@@ -19,7 +22,10 @@ class BatchesController < ApplicationController
 
     end
     def produce # Produce a Batch
-        batch = Batch.find(params[:id])
+        batch = Batch.where(params[:id])
+        if !params[:id]
+            render json: {status: 'SUCCESS', message:'Batch was not found', data: false}, status: :ok
+        end
         orders = JSON.parse(batch.orders)
         order_ids = []
         orders.each do |id|
@@ -32,6 +38,9 @@ class BatchesController < ApplicationController
     end
     def close # Close part of a Batch for a Delivery Service
         batch = Batch.find(params[:id])
+        if !params[:id]
+            render json: {status: 'SUCCESS', message:'Batch was not found', data: false}, status: :ok
+        end
         orders = JSON.parse(batch.orders)
         order_ids = []
         orders.each do |id|
