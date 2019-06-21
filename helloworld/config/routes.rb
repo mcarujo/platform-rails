@@ -4,7 +4,8 @@ Rails.application.routes.draw do
   root to: "orders#index"
 
   # orders routes
-  get "order", to: "orders#index" # for see all orders 
+  get "order", to: "orders#showAll" # for see all orders 
+  get "orders", to: "orders#index" # for see all orders 
   get "order/:id", to: "orders#show" # for see one order 
   get "order/search/status/name", to: "orders#showStatusByName" # get id and status for your orders (were not sent yet) by your name
   get "order/search/purchasechannel", to: "orders#showListByPurchaseChannel" # get all orders from a Purchase Channel

@@ -1,13 +1,14 @@
 class OrdersController < ApplicationController
     include OrdersHelper
-    def index
-        orders = Order.all
-        render json: {status: 'SUCCESS', message:'Orders list', data:orders},status: :ok
-    end
 
     def show
         order = Order.find(params[:id])
         render json: {status: 'SUCCESS', message:'Order information', data:order},status: :ok
+    end
+
+    def showAll
+        orders = Order.all
+        render json: {status: 'SUCCESS', message:'Orders list', data:orders},status: :ok
     end
 
     def showStatusByName # Get the status of an Order

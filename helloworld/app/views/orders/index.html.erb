@@ -1,0 +1,41 @@
+<html>
+    <%= nav_bar brand: "Orders", brand_link: root_url %>
+    <div class="container">
+        <body>
+            <div>
+                <h1 class="alert">Orders</h1>
+            </div>
+            <table class="table table-bordered table-hover">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="row">#</th>
+                        <th>Reference</th>
+                        <th>Purchase Channel</th>
+                        <th>Client Name</th>
+                        <th>Address</th>
+                        <th>Delivery Service</th>
+                        <th>Total Value</th>
+                        <th>Line Items</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% orders = Order.all %>
+                    <% orders.each do |order| %>
+                        <tr>
+                            <th scope="row"><%= order.id %></th>
+                            <td><%= order.reference %></td>
+                            <td><%= order.purchaseChannel %></td>
+                            <td><%= order.clientName %></td>
+                            <td><%= order.address %></td> 
+                            <td><%= order.deliveryService %></td>
+                            <td><%= order.totalValue %></td>
+                            <td><%= order.lineItems %></td> 
+                            <td><%= order.status %></td>
+                        </tr>
+                    <% end %>
+                </tbody>
+            </table>
+        </body>
+    <div>
+</html>
