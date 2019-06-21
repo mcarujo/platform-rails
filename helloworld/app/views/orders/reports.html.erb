@@ -1,0 +1,22 @@
+<div>
+    <h1 class="alert">Financial Report</h1>
+</div>
+<table class="table table-bordered table-hover">
+    <thead class="thead-dark">
+        <tr>
+            <th>Purchase Channel</th>
+            <th>Quantity of products</th>
+            <th>Total R$</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% reports = Order.select("purchaseChannel, count(id) as quantity, sum(totalValue) as total").where.not(status: 'sents').group('purchaseChannel') %>
+        <% reports.each do |report| %>
+            <tr>
+                <td><%= report.purchaseChannel %></td>
+                <td><%= report.quantity %></td>
+                <td><%= report.total %></td>
+            </tr>
+        <% end %>
+    </tbody>
+</table>
