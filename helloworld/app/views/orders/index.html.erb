@@ -20,7 +20,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <% orders = Order.all %>
+                    <% orders = Order.where.not(status: 'sent').order(id: :desc) %>
                     <% orders.each do |order| %>
                         <tr>
                             <th scope="row"><%= order.id %></th>
