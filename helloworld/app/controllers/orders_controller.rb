@@ -33,7 +33,7 @@ class OrdersController < ApplicationController
         if order.save
             render json: {status: 'SUCCESS', message:'Order created', data:order.id}, status: :ok
         else
-            render json: {status: 'SUCCESS', message:'Order was not created', data: false}, status: :ok
+            render json: {status: 'SUCCESS', message: order.errors.full_messages, data: false}, status: :ok
         end
     end
     def financialReport # Close part of a Batch for a Delivery Service

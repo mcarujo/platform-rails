@@ -14,7 +14,7 @@ class BatchesController < ApplicationController
         if batch.save
             render json: {status: 'SUCCESS', message:'Batch created', data: batch.id}, status: :ok
         else
-            render json: {status: 'SUCCESS', message:'Batch was not created', data: false}, status: :ok
+            render json: {status: 'SUCCESS', message: batch.errors.full_messages, data: false}, status: :ok
         end
 
     end
