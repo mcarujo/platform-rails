@@ -10,8 +10,13 @@ class BatchesController < ApplicationController
     end
     def create # Create a Batch
         postFields = params.permit(:reference, :purchaseChannel, :orders)
-        id = Batch.create postFields
-        render json: {status: 'SUCCESS', message:'Batch created', data: id.id}, status: :ok
+        batch = Batch.new postFields
+        if batch.save
+            render json: {status: 'SUCCESS', message:'Batch created', data: batch.id}, status: :ok
+        else
+            render json: {status: 'SUCCESS', message:'Batch was not created', data: false}, status: :ok
+        end
+
     end
     def produce # Produce a Batch
         batch = Batch.find(params[:id])

@@ -29,8 +29,12 @@ class OrdersController < ApplicationController
     end
     def create # Create a new Order
         postFields = params.permit(:reference, :purchaseChannel, :clientName, :address, :deliveryService, :totalValue, :lineItems, :status)
-        id = Order.create postFields
-        render json: {status: 'SUCCESS', message:'Orders created', data:id.id}, status: :ok
+        order = Order.new postFields
+        if order.save
+            render json: {status: 'SUCCESS', message:'Order created', data:order.id}, status: :ok
+        else
+            render json: {status: 'SUCCESS', message:'Order was not created', data: false}, status: :ok
+        end
     end
     def financialReport # Close part of a Batch for a Delivery Service
         report = Order.select("purchaseChannel, count(id) as quantidade, sum(totalValue) as total").where.not(status: 'sents').group('purchaseChannel')
