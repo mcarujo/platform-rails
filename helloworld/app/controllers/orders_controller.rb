@@ -27,19 +27,13 @@ class OrdersController < ApplicationController
         end
         render json: {status: 'SUCCESS', message: returnMessage, data: orders},status: :ok
     end
-    def showStatusById
-        orders = Order.where(params[:id])
-        if orders.size < 1
-            returnMessage = "The order with a id '#{params[:id]}' doesn't exist"
-        else
-            orders = cutInformationByStatus(orders)
-            returnMessage = 'Order information'
-        end
-        render json: {status: 'SUCCESS', message: returnMessage, data: orders},status: :ok
-    end
     def create # Create a new Order
         postFields = params.permit(:reference, :purchaseChannel, :clientName, :address, :deliveryService, :totalValue, :lineItems, :status)
         id = Order.create postFields
         render json: {status: 'SUCCESS', message:'Orders created', data:id.id}, status: :ok
+    end
+    def financialReport # Close part of a Batch for a Delivery Service
+        report = Order.select("purchaseChannel, count(id) as quantidade, sum(totalValue) as total").where.not(status: 'sents').group('purchaseChannel')
+        render json: {status: 'SUCCESS', message:'Financial Report', data: report}, status: :ok  
     end
 end
