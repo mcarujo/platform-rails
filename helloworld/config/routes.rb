@@ -6,6 +6,9 @@ Rails.application.routes.draw do
   # orders routes
   get "order", to: "orders#index" # for see all orders 
   get "order/:id", to: "orders#show" # for see all orders 
+  get "order/search/status/name", to: "orders#showStatusByName" # for see all orders 
+  get "order/search/status/id", to: "orders#showStatusById" # for see all orders 
+  get "order/search/purchasechannel", to: "orders#showListByPurchaseChannel" # for see all orders 
   post "order", to: "orders#create" # for create a new order
 
   #batches routes
