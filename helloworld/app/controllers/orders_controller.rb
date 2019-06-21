@@ -43,7 +43,7 @@ class OrdersController < ApplicationController
     end
     
     def financialReport # Close part of a Batch for a Delivery Service
-        report = Order.select("purchaseChannel, count(id) as quantidade, sum(totalValue) as total").where.not(status: 'sents').group('purchaseChannel')
+        report = Order.select("purchaseChannel, count(id) as quantity, sum(totalValue) as total").where.not(status: 'sents').group('purchaseChannel')
         render json: {status: 'SUCCESS', message:'Financial Report', data: report}, status: :ok  
     end
 end

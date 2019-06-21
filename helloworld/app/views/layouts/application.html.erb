@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Helloworld</title>
+    <title>Ruby on Rails</title>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
@@ -10,6 +10,14 @@
   </head>
 
   <body>
-    <%= yield %>
+      <%= nav_bar brand: "Orders", brand_link: 'order' do %>
+          <%= menu_group do %>
+          <%= menu_item "Batches", 'batch' %>
+          <%= menu_item "Reports", 'reports' %>
+          <% end %>
+      <% end %>
+      <div class="container">
+        <%= yield %>
+      </div>
   </body>
 </html>
