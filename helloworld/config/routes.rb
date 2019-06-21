@@ -4,17 +4,19 @@ Rails.application.routes.draw do
   root to: "orders#index"
 
   # orders routes
-  get "order", to: "orders#showAll" # for see all orders 
-  get "orders", to: "orders#index" # for see all orders 
+  get "order", to: "orders#index" # for see all orders 
+  get "orders", to: "orders#showAll" # for see all orders 
   get "order/:id", to: "orders#show" # for see one order 
   get "order/search/status/name", to: "orders#showStatusByName" # get id and status for your orders (were not sent yet) by your name
   get "order/search/purchasechannel", to: "orders#showListByPurchaseChannel" # get all orders from a Purchase Channel
   post "order", to: "orders#create" # for create a new order
   get "financial/report", to: "orders#financialReport" # get a little and simple financial report for all order is not sent yet
+  get "reports", to: "orders#reports" # get a little and simple financial report for all order is not sent yet
 
 
   #batches routes
   get "batch", to: "batches#index" # for see all batches 
+  get "batches", to: "batches#showAll" # for see all batches 
   get "batch/:id", to: "batches#show" # for see all batches 
   get "batch/produce/:id", to: "batches#produce" # for create a new batch
   post "batch", to: "batches#create" # for create a new batch
