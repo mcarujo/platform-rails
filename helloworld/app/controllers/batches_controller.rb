@@ -1,9 +1,6 @@
 require 'json'
 class BatchesController < ApplicationController
-    def index
-        batchs = Batch.all
-        render json: {status: 'SUCCESS', message:'Batchs list', data: batchs},status: :ok
-    end
+
     def show
         batch = Batch.find(params[:id])
         if !params[:id]
@@ -11,6 +8,12 @@ class BatchesController < ApplicationController
         end
         render json: {status: 'SUCCESS', message:'Batch information', data: batch},status: :ok
     end
+
+    def showAll
+        batchs = Batch.all
+        render json: {status: 'SUCCESS', message:'Batchs list', data: batchs},status: :ok
+    end
+
     def create # Create a Batch
         postFields = params.permit(:reference, :purchaseChannel, :orders)
         batch = Batch.new postFields
@@ -21,6 +24,7 @@ class BatchesController < ApplicationController
         end
 
     end
+
     def produce # Produce a Batch
         batch = Batch.where(params[:id])
         if !params[:id]
@@ -36,6 +40,7 @@ class BatchesController < ApplicationController
         end
         render json: {status: 'SUCCESS', message:'Batch produced', data: order_ids}, status: :ok  
     end
+
     def close # Close part of a Batch for a Delivery Service
         batch = Batch.find(params[:id])
         if !params[:id]
@@ -53,4 +58,5 @@ class BatchesController < ApplicationController
         end
         render json: {status: 'SUCCESS', message:'Batch sent', data: order_ids}, status: :ok  
     end
+
 end
