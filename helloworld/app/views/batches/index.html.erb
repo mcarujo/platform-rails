@@ -11,13 +11,13 @@
         </tr>
     </thead>
     <tbody>
-        <% batches = Batch.all %>
+        <% batches = Batch.all.order(id: :desc) %>
         <% batches.each do |batch| %>
             <tr>
                 <th scope="row"><%= batch.id %></th>
                 <td><%= batch.reference %></td>
                 <td><%= batch.purchaseChannel %></td>
-                <td><%= batch.orders %></td>
+                <td><%= batch.orders%></td>
             </tr>
         <% end %>
     </tbody>

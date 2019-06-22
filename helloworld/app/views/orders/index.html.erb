@@ -11,12 +11,12 @@
             <th>Address</th>
             <th>Delivery Service</th>
             <th>Total Value</th>
-            <th>Line Items</th>
+            <th class="limited-width">Line Items</th>
             <th>Status</th>
         </tr>
     </thead>
     <tbody>
-        <% orders = Order.where.not(status: 'sent').order(id: :desc) %>
+        <% orders = Order.order(id: :desc) %>
         <% orders.each do |order| %>
             <tr>
                 <th scope="row"><%= order.id %></th>
