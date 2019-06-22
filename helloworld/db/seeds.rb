@@ -1,7 +1,23 @@
-# This file should contain all the record creation needed to seed the database with its default values.
-# The data can then be loaded with the rails db:seed command (or created alongside the database with db:setup).
-#
-# Examples:
-#
-#   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
-#   Character.create(name: 'Luke', movie: movies.first)
+require 'faker'
+
+20.times do 
+    Order.create( reference: "BR" + Faker::Number.number(6), 
+        purchaseChannel: Faker::Company.name, 
+        clientName: Faker::Name.name, 
+        address: Faker::Address.full_address, 
+        deliveryService: Faker::Company.name, 
+        totalValue: Faker::Number.between(1,101), 
+        lineItems: Faker::Json.shallow_json(Faker::Number.between(1,6), key: 'Lorem.word', value: 'Lorem.word'),
+        status: [:ready, :production, :closing, :sent].sample 
+    )
+end
+
+20.times do 
+    purchaseChannel = Faker::Company.name
+    batch = Batch.new(reference: Faker::Number.number(4) + '-' + Faker::Number.number(2), purchaseChannel: purchaseChannel, orders: Array.new )
+    Faker::Number.between(1,6).times do
+        order = Order.create(reference: "BR" + Faker::Number.number(6), purchaseChannel: purchaseChannel, clientName: Faker::Name.name, address: Faker::Address.full_address, deliveryService: Faker::Company.name, totalValue: Faker::Number.between(1,101), lineItems: Faker::Json.shallow_json(Faker::Number.between(1,6), key: 'Lorem.word', value: 'Lorem.word'),status: [:ready, :production, :closing, :sent].sample )
+        batch.orders << order.id.to_s
+    end
+    batch.save
+end
