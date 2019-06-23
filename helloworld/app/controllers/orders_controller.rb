@@ -42,7 +42,7 @@ class OrdersController < ApplicationController
     end
     
     def financialReport # A simple financial report
-        report = Order.select("purchaseChannel, count(id) as quantity, sum(totalValue) as total").where.not(status: 'sents').group('purchaseChannel')
+        report = Order.select("purchaseChannel, count(reference) as quantity, sum(totalValue) as total").where.not(status: 'sents').group('purchaseChannel')
         render json: {message:'Financial Report', data: report}, status: :ok  
     end
 end

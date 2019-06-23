@@ -13,7 +13,7 @@
 ActiveRecord::Schema.define(version: 2019_06_20_203908) do
 
   create_table "batches", id: false, force: :cascade do |t|
-    t.string "reference"
+    t.string "reference", auto_increment: true
     t.string "purchaseChannel"
     t.text "orders"
     t.datetime "created_at", null: false

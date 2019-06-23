@@ -2,61 +2,70 @@ require 'json'
 class BatchesController < ApplicationController
 
     def show
-        batch = Batch.find(params[:id])
-        if !params[:id]
-            render json: {status: 'SUCCESS', message:'Batch was not found', data: false}, status: :ok
-        end
-        render json: {status: 'SUCCESS', message:'Batch information', data: batch},status: :ok
+        render json: {message:'Batch information', data: Batch.find_by(reference: params[:reference])}, status: :ok
     end
 
     def showAll
-        batchs = Batch.all
-        render json: {status: 'SUCCESS', message:'Batchs list', data: batchs},status: :ok
+        render json: {message:'Batchs list', data: Batch.all}, status: :ok
     end
 
     def create # Create a Batch
         postFields = params.permit(:reference, :purchaseChannel, :orders)
+        if !JSON.parse(params[:orders]) # Validation orders as json
+            return render json: {message:'The field orders must be a valid JSON', data: false}, status: :ok
+        end
         batch = Batch.new postFields
         if batch.save
-            render json: {status: 'SUCCESS', message:'Batch created', data: batch.id}, status: :ok
+            json = {message:'Batch created', data: {reference: batch.reference, numOrders: '10'}}
         else
-            render json: {status: 'SUCCESS', message: batch.errors.full_messages, data: false}, status: :ok
+            json = {message: batch.errors.full_messages, data: false}
         end
-
+        render json: json, status: :ok
     end
 
     def produce # Produce a Batch
-        batch = Batch.where(params[:id])
-        if !params[:id]
-            render json: {status: 'SUCCESS', message:'Batch was not found', data: false}, status: :ok
+        if !params.include?(:reference) # Validation
+            return render json: {message:'No field reference', data: false}, status: :ok
         end
-        orders = JSON.parse(batch.orders)
-        order_ids = []
-        orders.each do |id|
-            order = Order.find(id)
-            order.status = 'closing'
-            order.save
-            order_ids << order.id
+        batch = Batch.find_by(reference: params[:reference])
+        if batch == nil # did I found something?
+            return render json: {message:'No batch found', data: false}, status: :ok
         end
-        render json: {status: 'SUCCESS', message:'Batch produced', data: order_ids}, status: :ok  
+        orders = JSON.parse(batch.orders.to_s)
+        order_references = []
+        orders.each do |reference|
+            order = Order.find_by(reference: reference)
+            if order.status == 'production' # if was printed...
+                order.status = 'closing' # set already produced (closing)
+                order.save
+                order_references << order.reference
+            end
+        end
+        render json: {message:'Batch produced and returned orders references', data: order_references}, status: :ok  
     end
 
     def close # Close part of a Batch for a Delivery Service
-        batch = Batch.find(params[:id])
-        if !params[:id]
-            render json: {status: 'SUCCESS', message:'Batch was not found', data: false}, status: :ok
+        if !params.include?(:reference) # Validation
+            return render json: {message:'No field reference', data: false}, status: :ok
+        elsif !params.include?(:deliveryService) 
+            return render json: {message:'No field deliveryService', data: false}, status: :ok
         end
-        orders = JSON.parse(batch.orders)
-        order_ids = []
-        orders.each do |id|
-            order = Order.find(id)
-            if order.deliveryService == params[:deliveryService]
+        devileryService = params[:deliveryService]
+        batch = Batch.find_by(reference: params[:reference])
+        if batch == nil # did I found something?
+            return render json: {message:'No batch found', data: false}, status: :ok
+        end
+        orders = JSON.parse(batch.orders.to_s)
+        order_references = []
+        orders.each do |reference|
+            order = Order.find_by(reference: reference)
+            if order.deliveryService == devileryService && order.status == 'closing'
                 order.status = 'sent'
                 order.save
-                order_ids << order.id
+                order_references << order.reference
             end
         end
-        render json: {status: 'SUCCESS', message:'Batch sent', data: order_ids}, status: :ok  
+        render json: {message:'Batch closed and returned orders references', data: order_references}, status: :ok  
     end
 
 end
