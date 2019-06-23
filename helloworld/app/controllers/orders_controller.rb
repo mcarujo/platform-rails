@@ -2,7 +2,7 @@ class OrdersController < ApplicationController
     include OrdersHelper
 
     def show
-        render json: {message:'Order information', data: Order.find(params[:id])}, status: :ok
+        render json: {message:'Order information', data: Order.find_by({reference: params[:reference]})}, status: :ok
     end
 
     def showAll
@@ -34,7 +34,7 @@ class OrdersController < ApplicationController
         postFields = params.permit(:reference, :purchaseChannel, :clientName, :address, :deliveryService, :totalValue, :lineItems, :status)
         order = Order.new postFields
         if order.save
-           json = {message:'Order created', data: order.id}
+           json = {message:'Order created', data: order.reference}
         else
             json = {message: order.errors.full_messages, data: false}
         end
