@@ -12,7 +12,7 @@
 
 ActiveRecord::Schema.define(version: 2019_06_20_203908) do
 
-  create_table "batches", force: :cascade do |t|
+  create_table "batches", id: false, force: :cascade do |t|
     t.string "reference"
     t.string "purchaseChannel"
     t.text "orders"
@@ -20,7 +20,7 @@ ActiveRecord::Schema.define(version: 2019_06_20_203908) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "orders", force: :cascade do |t|
+  create_table "orders", id: false, force: :cascade do |t|
     t.string "reference"
     t.string "purchaseChannel"
     t.string "clientName"
