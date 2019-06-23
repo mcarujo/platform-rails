@@ -4,7 +4,6 @@
 <table class="table table-bordered table-hover">
     <thead class="thead-dark">
         <tr>
-            <th scope="row">#</th>
             <th>Reference</th>
             <th>Purchase Channel</th>
             <th>Orders</th>
@@ -14,7 +13,6 @@
         <% batches = Batch.all.order(id: :desc) %>
         <% batches.each do |batch| %>
             <tr>
-                <th scope="row"><%= batch.id %></th>
                 <td><%= batch.reference %></td>
                 <td><%= batch.purchaseChannel %></td>
                 <td><%= batch.orders%></td>

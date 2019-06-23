@@ -10,7 +10,7 @@
         </tr>
     </thead>
     <tbody>
-        <% reports = Order.select("purchaseChannel, count(id) as quantity, sum(totalValue) as total").where.not(status: 'sents').group('purchaseChannel') %>
+        <% reports = Order.select("purchaseChannel, count(reference) as quantity, sum(totalValue) as total").where.not(status: 'sents').group('purchaseChannel') %>
         <% reports.each do |report| %>
             <tr>
                 <td><%= report.purchaseChannel %></td>
