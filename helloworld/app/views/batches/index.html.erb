@@ -10,7 +10,7 @@
         </tr>
     </thead>
     <tbody>
-        <% batches = Batch.all.order(id: :desc) %>
+        <% batches = Batch.all.order(reference: :desc) %>
         <% batches.each do |batch| %>
             <tr>
                 <td><%= batch.reference %></td>

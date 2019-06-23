@@ -15,7 +15,7 @@
         </tr>
     </thead>
     <tbody>
-        <% orders = Order.order(id: :desc) %>
+        <% orders = Order.order(reference: :desc) %>
         <% orders.each do |order| %>
             <tr>
                 <td><%= order.reference %></td>
