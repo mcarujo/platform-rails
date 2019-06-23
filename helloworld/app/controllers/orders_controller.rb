@@ -25,7 +25,7 @@ class OrdersController < ApplicationController
             json = {message: "No field status", data: false}
         else
             orders = Order.where(purchaseChannel: params[:purchaseChannel], status: params[:status])
-            {message: "Orders status by purchase channel and status", data: orders}
+            json = {message: "Orders status by purchase channel and status", data: orders}
         end
         render json: json, status: :ok
     end
