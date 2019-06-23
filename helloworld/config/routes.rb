@@ -17,8 +17,9 @@ Rails.application.routes.draw do
   #batches routes
   get "batch", to: "batches#index" # for see all batches 
   get "batches", to: "batches#showAll" # for see all batches 
-  get "batch/:id", to: "batches#show" # for see all batches 
-  get "batch/produce/:id", to: "batches#produce" # for create a new batch
+  # get "batch/:id", to: "batches#show" # for see all batches 
+  get "batch/produce", to: "batches#produce" # for create a new batch
+  get "batch/close", to: "batches#close" # for create a new batch
   post "batch", to: "batches#create" # for create a new batch
 
 end
