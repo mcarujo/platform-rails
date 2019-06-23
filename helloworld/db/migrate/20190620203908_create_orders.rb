@@ -1,7 +1,7 @@
 class CreateOrders < ActiveRecord::Migration[5.2]
   def change
     create_table :orders, id: false, :primary_key => :reference do |t|
-      t.string :reference
+      t.string :reference, null: false
       t.string :purchaseChannel
       t.string :clientName
       t.string :address
