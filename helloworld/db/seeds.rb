@@ -28,7 +28,7 @@ end
                 lineItems: Faker::Json.shallow_json(Faker::Number.between(1,6), key: 'Lorem.word', value: 'Lorem.word'), 
                 status: [:ready, :production, :closing, :sent].sample
             )
-        aux << order.id
+        aux << order.reference
     end
     batch.orders = aux.to_json
     batch.save
