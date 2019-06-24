@@ -1,9 +1,9 @@
 class CreateBatches < ActiveRecord::Migration[5.2]
   def change
-    create_table :batches, id: false, :primary_key => :reference do |t|
+    create_table :batches do |t|
       t.string :reference, null: false
-      t.string :purchaseChannel
-      t.text :orders
+      t.string :purchaseChannel, null: false
+      t.text :orders, null: false
 
       t.timestamps
     end

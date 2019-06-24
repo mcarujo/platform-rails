@@ -1,14 +1,14 @@
 class CreateOrders < ActiveRecord::Migration[5.2]
   def change
-    create_table :orders, id: false, :primary_key => :reference do |t|
+    create_table :orders do |t|
       t.string :reference, null: false
-      t.string :purchaseChannel
-      t.string :clientName
-      t.string :address
-      t.string :deliveryService
-      t.float :totalValue
-      t.text :lineItems
-      t.string :status
+      t.string :purchaseChannel, null: false
+      t.string :clientName, null: false
+      t.string :address, null: false
+      t.string :deliveryService, null: false
+      t.float :totalValue, null: false
+      t.text :lineItems, null: false
+      t.string :status, null: false
 
       t.timestamps
     end
