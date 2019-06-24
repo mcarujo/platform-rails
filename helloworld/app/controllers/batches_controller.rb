@@ -1,8 +1,9 @@
 require 'json'
 class BatchesController < ApplicationController
-
+    include BatchesHelper
     def show
-        render json: {message:'Batch information', data: Batch.find_by(reference: params[:reference])}, status: :ok
+        render json: definePKBatches()
+        # render json: {message:'Batch information', data: Batch.find_by(reference: params[:reference])}, status: :ok
     end
 
     def showAll
@@ -10,13 +11,31 @@ class BatchesController < ApplicationController
     end
 
     def create # Create a Batch
-        postFields = params.permit(:reference, :purchaseChannel, :orders)
-        if !JSON.parse(params[:orders]) # Validation orders as json
-            return render json: {message:'The field orders must be a valid JSON', data: false}, status: :ok
+        if !params.include?(:purchaseChannel) # Validation for name
+            return render json: {message: "No field purchaseChannel", data: false},status: :ok
         end
-        batch = Batch.new postFields
+
+        purchaseChannel = params[:purchaseChannel]
+        orders = Order.where(purchaseChannel: purchaseChannel, status: 'ready')
+
+        if orders.size == 0
+            return render json: {message:"Has no order to create a batch for '#{purchaseChannel}''", data: false}, status: :ok
+        end
+        
+        batch = Batch.new
+        batch.reference = definePKBatches()
+        batch.purchaseChannel = purchaseChannel
+        
+        ordersReferences = []
+        orders.each do |order|
+            order.status = 'production'
+            ordersReferences << order.reference
+            order.save
+        end
+        
+        batch.orders = ordersReferences.to_json
         if batch.save
-            json = {message:'Batch created', data: {reference: batch.reference, numOrders: '10'}}
+            json = {message:'Batch created', data: {reference: batch.reference, numOrders: orders.size}}
         else
             json = {message: batch.errors.full_messages, data: false}
         end
