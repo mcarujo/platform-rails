@@ -12,23 +12,23 @@
 
 ActiveRecord::Schema.define(version: 2019_06_20_203908) do
 
-  create_table "batches", id: false, force: :cascade do |t|
+  create_table "batches", force: :cascade do |t|
     t.string "reference", null: false
-    t.string "purchaseChannel"
-    t.text "orders"
+    t.string "purchaseChannel", null: false
+    t.text "orders", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
-  create_table "orders", id: false, force: :cascade do |t|
+  create_table "orders", force: :cascade do |t|
     t.string "reference", null: false
-    t.string "purchaseChannel"
-    t.string "clientName"
-    t.string "address"
-    t.string "deliveryService"
-    t.float "totalValue"
-    t.text "lineItems"
-    t.string "status"
+    t.string "purchaseChannel", null: false
+    t.string "clientName", null: false
+    t.string "address", null: false
+    t.string "deliveryService", null: false
+    t.float "totalValue", null: false
+    t.text "lineItems", null: false
+    t.string "status", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
