@@ -7,4 +7,9 @@ module OrdersHelper
         end
         aux
     end
+    def definePKOrders
+        prefix = "BR"
+        ordersnumbers = Order.all.size.to_s.rjust(6, '0') # 00000X
+        primarykey = prefix + ordersnumbers.to_s
+    end
 end

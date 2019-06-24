@@ -2,7 +2,6 @@ class OrdersController < ApplicationController
     include OrdersHelper
 
     def show
-        # return render json: definePK
         render json: {message:'Order information', data: Order.find_by({reference: params[:reference]})}, status: :ok
     end
 
@@ -32,8 +31,9 @@ class OrdersController < ApplicationController
     end
 
     def create # Create a new Order
-        postFields = params.permit(:reference, :purchaseChannel, :clientName, :address, :deliveryService, :totalValue, :lineItems, :status)
+        postFields = params.permit(:purchaseChannel, :clientName, :address, :deliveryService, :totalValue, :lineItems, :status)
         order = Order.new postFields
+        order.reference = definePKOrders()
         if order.save
            json = {message:'Order created', data: order.reference}
         else
