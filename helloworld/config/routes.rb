@@ -2,7 +2,7 @@ Rails.application.routes.draw do
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
   # The root is a redirect to the orders index
   root to: "orders#index"
-
+  
   # orders routes
   get "order", to: "orders#index" # for see all orders 
   get "orders", to: "orders#showAll" # for see all orders 
@@ -13,7 +13,7 @@ Rails.application.routes.draw do
   get "financial/report", to: "orders#financialReport" # get a little and simple financial report for all order is not sent yet
   get "reports", to: "orders#reports" # get a little and simple financial report for all order is not sent yet
 
-
+  get "teste", to: "orders#show"
   #batches routes
   get "batch", to: "batches#index" # for see all batches 
   get "batches", to: "batches#showAll" # for see all batches 

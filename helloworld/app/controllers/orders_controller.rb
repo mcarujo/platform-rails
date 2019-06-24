@@ -2,6 +2,7 @@ class OrdersController < ApplicationController
     include OrdersHelper
 
     def show
+        # return render json: definePK
         render json: {message:'Order information', data: Order.find_by({reference: params[:reference]})}, status: :ok
     end
 
