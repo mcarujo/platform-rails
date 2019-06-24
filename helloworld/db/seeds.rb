@@ -1,8 +1,10 @@
 require 'faker'
+include OrdersHelper
+include BatchesHelper
 
 100.times do 
     Order.create( 
-        reference: "BR" + Faker::Number.number(6), 
+        reference: definePKOrders(), 
         purchaseChannel: Faker::Company.name, 
         clientName: Faker::Name.name, 
         address: Faker::Address.full_address, 
@@ -16,11 +18,11 @@ end
 50.times do 
     purchaseChannel = Faker::Company.name
     deliveryService = Faker::Company.name
-    batch = Batch.new(reference: Faker::Number.number(6) + '-' + Faker::Number.number(2), purchaseChannel: purchaseChannel, orders: [] )
+    batch = Batch.new(reference: definePKBatches(), purchaseChannel: purchaseChannel, orders: [] )
     aux = []
     Faker::Number.between(1,6).times do
         order = Order.create(
-                reference: "BR" + Faker::Number.number(6), 
+                reference: definePKOrders(), 
                 purchaseChannel: purchaseChannel, 
                 clientName: Faker::Name.name, 
                 address: Faker::Address.full_address, 
