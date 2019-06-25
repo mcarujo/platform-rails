@@ -22,7 +22,8 @@ class BatchesController < ApplicationController
         if AllOrders.size == 0 || AllOrders == []
             return render json: {message:"Has no order to create a batch for '#{purchaseChannel}''", data: false}, status: :ok
         end
-
+        
+        batches = []
         ## for every deliveryService will be create a new batch
         AllOrders.each do |ordersByDelivery|
             batch = Batch.new
