@@ -14,7 +14,7 @@
 
 ### Ordem
 
-- Para a entidade `order` foi feita a seguinte estrutura no `migrations`. Uma observação que deve ser feita é que a coluna 'lineItems' é um campo `text` o qual guarda um `JSON` e é tratado pela API da mesma forma.
+- Para a entidade `order` foi criada todas as colunas apresentadas e uma observação que deve ser feita é que a coluna 'lineItems' é um campo `text` o qual guarda um `JSON` e é tratado pela API da mesma forma.
 
   ```ruby
     class CreateOrders < ActiveRecord::Migration[5.2]
@@ -37,7 +37,7 @@
 
 ### Batch
 
-- Para a entidade `batch` foi feita uma estrutura bem semelhante a anterior. Um detalhe importante é que o campo _orders_ ("A group of orders") também é um campo `text` no banco de dados o qual guarda um `JSON` e é tratado como um `JSON` por toda a API.
+- Para a entidade `batch` foi feita uma estrutura bem semelhante a anterior. Um detalhe que se repete é que o campo _orders_ ("A group of orders") também é um campo `text` no banco de dados o qual guarda um `JSON` e é tratado como um `JSON` por toda a API.
 
   ```ruby
     class CreateBatches < ActiveRecord::Migration[5.2]
