@@ -10,31 +10,34 @@
 
 ## Entidades
 
-- Toda a estrutura de banco de dados pode ser feita realizado com o `migrations` do ruby on rails.
+- Toda a estrutura de banco de dados foi feita realizado com o `migrations` do ruby on rails.
 
 ### Ordem
 
-- Para a entidade `order` foi feita a seguinte estrutura:
+- Para a entidade `order` foi feita a seguinte estrutura no `migrations`. Uma observação que deve ser feita é que a coluna 'lineItems' é um campo `text` o qual guarda um `JSON` e é tratado pela API da mesma forma.
 
   ```ruby
-  def change
-      create_table :orders do |t|
-      t.string :reference, null: false # Reference (e.g. BR102030)
-      t.string :purchaseChannel, null: false # Purchase Channel (e.g. Site BR)
-      t.string :clientName, null: false # Client Name (e.g. São Clênio)
-      t.string :address, null: false # Address (e.g. Av. Amintas Barros Nº 2 [...] CEP: 59075-250)
-      t.string :deliveryService, null: false # Delivery Service (e.g. SEDEX)
-      t.float :totalValue, null: false # Total Value (e.g. R\$ 123.30)
-      t.text :lineItems, null: false # Line Itemss [...] e.g. [{sku: case-my-best-friend, model: iPhone X, case type: Rose Leather}] )
-      t.string :status, null: false # Status: ready, production, closing, sent.
+    class CreateOrders < ActiveRecord::Migration[5.2]
+      def change
+        create_table :orders do |t|
+          t.string :reference, null: false
+          t.string :purchaseChannel, null: false
+          t.string :clientName, null: false
+          t.string :address, null: false
+          t.string :deliveryService, null: false
+          t.float :totalValue, null: false
+          t.text :lineItems, null: false
+          t.string :status, null: false
 
-      t.timestamps
+          t.timestamps
+        end
       end
+    end
   ```
 
 ### Batch
 
-- Para a entidade `batch` foi feita uma estrutura bem semelhante a anterior. Um detalhe importante é que o campo _orders_ ("A group of orders") é um campo `text` no banco de dados o qual guarda um `JSON` e é tratado como um `JSON` por toda a API.
+- Para a entidade `batch` foi feita uma estrutura bem semelhante a anterior. Um detalhe importante é que o campo _orders_ ("A group of orders") também é um campo `text` no banco de dados o qual guarda um `JSON` e é tratado como um `JSON` por toda a API.
 
   ```ruby
     class CreateBatches < ActiveRecord::Migration[5.2]
