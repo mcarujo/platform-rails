@@ -1,12 +1,12 @@
 ## Ruby on Rails 5
 
-- Para criação da API foi utilizado o Ruby on Rails na versão 5.
-- O banco de dados para desenvolvimento é o `sqlite3` porém recomenda-se um banco de dados como `MySQL` ou `Postgres` para colocar em produção.
+- Para criação desta API foi utilizado o Ruby on Rails na versão 5.
+- O banco de dados para desenvolvimento é o `sqlite3` porém em caso de colocar a API para produção recomenda-se um banco de dados como `MySQL` ou `Postgres` para colocar em produção.
 
 ## Instalação
 
-- Partindo do pressuposto que você já tem um `ruby` instalado na sua máquina e tudo mais, você só precisa instalar todas as dependências do projeto, além de o banco de dados `sqlite3`, você pode acessar informações para este procedimento nesse [link](https://www.sqlite.org/download.html).
-- Ao finalizar a instalação das dependências, você deve subir o banco de dados(migrate), para isso você pode digitar o comando `rails db:migrate` dentro do diretório do projeto. Após isso você pode subir dados fictícios para melhor visualização com o comando `rails db:seed`.
+- Partindo do pressuposto que você já tem um `ruby` instalado na sua máquina e tudo mais, você só precisará instalar todas as dependências do projeto com o comando `bundle install`. Além disso você precisa ter o banco de dados `sqlite3` instalado no servidor, você pode acessar informações para este procedimento nesse [link](https://www.sqlite.org/download.html).
+- Ao finalizar a instalação das dependências, você deve subir o banco de dados pelo _migrate_, para isso você pode digitar o comando `rails db:migrate` dentro do diretório do projeto. Após isso você pode subir dados fictícios para melhor visualização com o comando `rails db:seed`.
 
 ## Entidades
 
