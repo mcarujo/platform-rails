@@ -1,16 +1,17 @@
-## Ruby on Rails 5
+## Sobre o repositório
 
 - Para criação desta API foi utilizado o Ruby on Rails na versão 5.
-- O banco de dados para desenvolvimento é o `sqlite3` porém em caso de colocar a API para produção recomenda-se um banco de dados como `MySQL` ou `Postgres` para colocar em produção.
+- O banco de dados para desenvolvimento é o `sqlite3` e este por sua vez já esta configurado no repositório, porém em caso de colocar a API para produção recomenda-se um banco de dados como `MySQL` ou `Postgres` para colocar em produção.
+- O _schema_ final do banco de dados pode ser visualizado no aquivo [schema.rb](https://github.com/mcarujo/RailsHelloWorld/blob/master/helloworld/db/schema.rb), porém essa estrutura será abordada em um tópico aqui presente.
 
 ## Instalação
 
 - Partindo do pressuposto que você já tem um `ruby` instalado na sua máquina e tudo mais, você só precisará instalar todas as dependências do projeto com o comando `bundle install`. Além disso você precisa ter o banco de dados `sqlite3` instalado no servidor, você pode acessar informações para este procedimento nesse [link](https://www.sqlite.org/download.html).
-- Ao finalizar a instalação das dependências, você deve subir o banco de dados pelo _migrate_, para isso você pode digitar o comando `rails db:migrate` dentro do diretório do projeto. Após isso você pode subir dados fictícios para melhor visualização com o comando `rails db:seed`.
+- Ao finalizar a instalação das dependências, você deve subir a estrutura do banco de dados pelo _migrate_, para isso você pode digitar o comando `rails db:migrate` dentro do diretório do projeto. Após isso você pode subir alguns dados fictícios para melhor visualização com o comando `rails db:seed`.
 
 ## Entidades
 
-- Toda a estrutura de banco de dados foi feita realizado com o `migrations` do ruby on rails.
+- Toda a estrutura de banco de dados foi feita com o `migrations` do RoR (Ruby on Rails). Ambas possuem uma _primary key_ chamada ID e duas tabelas chamadas _created_at_ e _updated_at_ que são atualizadas automaticamente, sendo o padrão na estrutura do migrate do RoR, e isto não foi alterado. A validação dos dados estão presente na camada de Model da API, sendo estes os arquivos [order.rb](https://github.com/mcarujo/RailsHelloWorld/blob/master/helloworld/app/models/order.rb) e [batch.rb](https://github.com/mcarujo/RailsHelloWorld/blob/master/helloworld/app/models/batch.rb).
 
 ### Ordem
 
@@ -20,7 +21,7 @@
     class CreateOrders < ActiveRecord::Migration[5.2]
       def change
         create_table :orders do |t|
-          t.string :reference, null: false
+          t.string :reference, null: false, uniqueness: true
           t.string :purchaseChannel, null: false
           t.string :clientName, null: false
           t.string :address, null: false
@@ -41,15 +42,15 @@
 
   ```ruby
     class CreateBatches < ActiveRecord::Migration[5.2]
-    def change
-        create_table :batches do |t|
-        t.string :reference, null: false # Reference (e.g. 201803-54)
-        t.string :purchaseChannel, null: false # Purchase Channel(e.g. Site BR)
-        t.text :orders, null: false # A group of orders.
+        def change
+            create_table :batches do |t|
+            t.string :reference, null: false, unique: true
+            t.string :purchaseChannel, null: false
+            t.text :orders, null: false
 
-        t.timestamps
+            t.timestamps
+            end
         end
-    end
     end
   ```
 
@@ -57,11 +58,11 @@
 
 - Sobre o primeiro ponto destacado, em nenhum momento da API criará alguma `batch` com `orders` de diferentes `Purchase Channel`, Nem na rota de criação e nem do `faker`, para mais detalhes convido a análise do método `create` presente no controller [orders_controller.rb](https://github.com/mcarujo/RailsHelloWorld/blob/master/helloworld/app/controllers/orders_controller.rb) e do arquivo [seeds.rb](https://github.com/mcarujo/RailsHelloWorld/blob/master/helloworld/db/seeds.rb).
 
-- Apenas as tabelas `orders` e `batches` foram criadas e utilizadas.
+- Apenas as tabelas `orders` e `batches` foram criadas e utilizadas por mim. Qualquer outra tabela presente no banco de dados é utilizada pelo Ruby on Rails, para controle de versão do migrate ou pelo banco de dados para controle de sequencia de _primary key_.
 
 ## Ações (Actions)
 
-### Create a new Order
+### Criando uma nova Ordem (Create a new Order)
 
 - Para criar uma ordem, precisamos enviar uma requisição `POST` para a rota `/order` com os campos 'purchaseChannel', 'clientName', 'address', 'deliveryService', 'totalValue', 'lineItems' e 'status' válidos, isto é não sendo nulo. Ao receber essas informações, é gerado o campo 'reference' com a chamada do método 'helper' 'definePKOrders'. Caso tenha sucesso na gravação da nova order, retornamos a informação ao usuário, caso contrário retornamos uma mensagem de erro.
 
@@ -79,7 +80,7 @@
       end
   ```
 
-### Get the status of an Order
+### Consultar um status de uma Ordem (Get the status of an Order)
 
 - Para buscar informações com o nome do cliente, precisamos enviar uma requisição com o verbo `GET`para a rota `/order/search/status/name` com o campo 'name' presente. Caso todos os dados forem devidamente recebidos, retornamos todas as ordens do cliente que não estiverem com o 'status' igual a 'sent', isto é enviado e portanto uma ordem já finalizada.
 
@@ -95,13 +96,13 @@
 
   ```
 
-### List the Orders of a Purchase Channel
+### Listar todas as Ordens por um Canal de Compra (List the Orders of a Purchase Channel)
 
 - Para buscar informações de um _Purchase Channel_ com um determinado _Status_ precisamos enviar estes dois dados para a rota `/order/search/purchasechannel` com o verbo `GET`.
   Caso seja enviado todos os campos corretamente, será retorno o resultado da pesquisa, se não será retornado uma mensagem de erro com o campos de retorno com valor _false_.
 
   ```ruby
-         def showListByPurchaseChannel # List the Orders of a Purchase Channel
+    def showListByPurchaseChannel # List the Orders of a Purchase Channel
         if !params.include?(:purchaseChannel) # Validation for Purchase Channel
             json = {message: "No field purchaseChannel", data: false}
         elsif !params.include?(:status) # Validation Status
@@ -115,7 +116,7 @@
 
   ```
 
-### Create a Batch
+### Criar um Lote (Create a Batch)
 
 - Para criar um novo Batch, precisamos receber uma requisição com o verbo `POST` na rota `/batch` com o campo 'purchaseChannel'. Ao receber a requisição,
   verificamos se o campo está presente e após isso buscamos todas as _orders_ presentes com este 'purchaseChannel' que estão com o 'status' igual a 'ready' isto é, o pedido ou melhor a
@@ -157,7 +158,7 @@
 
   ```
 
-### Produce a Batch
+### Produzir um Lote (Produce a Batch)
 
 - Para produzir um _Batch_ precisamos receber a 'reference' do mesmo, ai iremos verificar se alguém ordem presente no _Batch_ está disponível para transitar do estado de 'production' para o de 'closing'.
 
@@ -185,7 +186,7 @@
 
   ```
 
-### Close part of a Batch for a Delivery Service
+### Finalizar parte de um Lote dado um Serviço de Entrega (Close part of a Batch for a Delivery Service)
 
 - Para fechar um _Batch_ precisamos receber além da 'reference' o campo 'deliveryService', aí iremos verificar se alguma ordem presente no _Batch_ está disponível para transitar do estado de 'closing' para o de 'sent' além de ter o mesmo 'deliveryService' do informado pelo usuário. Isto significa que a ordem foi entregue pelo serviço de entrega.
 
@@ -215,7 +216,7 @@
       end
   ```
 
-### A simple financial report
+### Um simples relatório financeiro (A simple financial report)
 
 - O relatório financeiro é simplesmente um somatório de todas as ordens em aberto por canal de venda (Purchase Channel).
 
@@ -226,7 +227,7 @@
       end
   ```
 
-## Melhorias (Additional Stuff)
+## Melhorias e Aprimoramentos (Additional Stuff)
 
 - A camada de segurança pode ser realizada através de uma verificação de usuário, um padrão de autorização muito eficiente é o JWT, em que basicamente consiste em o usuário fazer o login, e receber um token em caso de sucesso de login e em cada requisição feita na API deve-se informar este mesmo token. Para mais informações acessar o [site](https://jwt.io/). O fluxo de funcionamento é exibido na imagem abaixo, onde primeiramente é feito o login pelo usuário, este por sua vez recebe o JWT, e armazena o mesmo para quando for enviar uma requisição para a API este JWT seja verificado e em caso de sucesso é retornado o dado requerido pelo usuário. Dessa forma ninguém sem um acesso válido que este seria liberado por nós, conseguiria ter acesso a API. Lembrando que para a implantação deste padrão de autenticação e navegação deve-se criar toda uma estrutura na API e no banco de dados.
 
