@@ -16,28 +16,36 @@ class BatchesController < ApplicationController
         end
 
         purchaseChannel = params[:purchaseChannel]
-        orders = Order.where(purchaseChannel: purchaseChannel, status: 'ready')
+        # get all orders from this purchase channel
+        AllOrders = Order.select("deliveryService as ds, group_concat(reference) as refs").where(purchaseChannel: purchaseChannel, status: 'ready').group('deliveryService')
 
-        if orders.size == 0
+        if AllOrders.size == 0 || AllOrders == []
             return render json: {message:"Has no order to create a batch for '#{purchaseChannel}''", data: false}, status: :ok
         end
-        
-        batch = Batch.new
-        batch.reference = definePKBatches()
-        batch.purchaseChannel = purchaseChannel
-        
-        ordersReferences = []
-        orders.each do |order|
-            order.status = 'production'
-            ordersReferences << order.reference
-            order.save
+
+        ## for every deliveryService will be create a new batch
+        AllOrders.each do |ordersByDelivery|
+            batch = Batch.new
+            batch.reference = definePKBatches()
+            batch.purchaseChannel = purchaseChannel
+            ordersLocal = ordersByDelivery.refs.split(',') # take all orders by delivery service like a Array
+            ordersReferences = []
+            ordersLocal.each do |order|
+                order = Order.find_by(reference: orderLocal)
+                order.status = 'production'
+                ordersReferences << order.reference
+                order.save
+            end
+            batch.orders = ordersReferences.to_json
+            if batch.save
+                batches << {reference: batch.reference, numOrders: ordersLocal.size}
+            end
         end
-        
-        batch.orders = ordersReferences.to_json
-        if batch.save
-            json = {message:'Batch created', data: {reference: batch.reference, numOrders: orders.size}}
+
+        if batches.size != 0 || batches == []
+            json = {message:'Batch(es) created', data: batches }
         else
-            json = {message: batch.errors.full_messages, data: false}
+            json = {message: "For some reason, we can't create your batch, please contact us", data: false}
         end
         render json: json, status: :ok
     end
@@ -69,7 +77,7 @@ class BatchesController < ApplicationController
         elsif !params.include?(:deliveryService) 
             return render json: {message:'No field deliveryService', data: false}, status: :ok
         end
-        devileryService = params[:deliveryService]
+        deliveryService = params[:deliveryService]
         batch = Batch.find_by(reference: params[:reference])
         if batch == nil # did I found something?
             return render json: {message:'No batch found', data: false}, status: :ok
@@ -78,7 +86,7 @@ class BatchesController < ApplicationController
         order_references = []
         orders.each do |reference|
             order = Order.find_by(reference: reference)
-            if order.deliveryService == devileryService && order.status == 'closing'
+            if order.deliveryService == deliveryService && order.status == 'closing'
                 order.status = 'sent'
                 order.save
                 order_references << order.reference
