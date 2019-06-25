@@ -65,19 +65,19 @@
 
 - Para criar uma ordem, precisamos enviar uma requisição `POST` para a rota `/order` com os campos 'purchaseChannel', 'clientName', 'address', 'deliveryService', 'totalValue', 'lineItems' e 'status' válidos, isto é não sendo nulo. Ao receber essas informações, é gerado o campo 'reference' com a chamada do método 'helper' 'definePKOrders'. Caso tenha sucesso na gravação da nova order, retornamos a informação ao usuário, caso contrário retornamos uma mensagem de erro.
 
-```ruby
-    def create # Create a new Order
-        postFields = params.permit(:purchaseChannel, :clientName, :address, :deliveryService, :totalValue, :lineItems, :status)
-        order = Order.new postFields
-        order.reference = definePKOrders()
-        if order.save
-            json = {message:'Order created', data: order.reference}
-        else
-            json = {message: order.errors.full_messages, data: false}
-        end
-        render json: json, status: :ok
-    end
-```
+  ```ruby
+      def create # Create a new Order
+          postFields = params.permit(:purchaseChannel, :clientName, :address, :deliveryService, :totalValue, :lineItems, :status)
+          order = Order.new postFields
+          order.reference = definePKOrders()
+          if order.save
+              json = {message:'Order created', data: order.reference}
+          else
+              json = {message: order.errors.full_messages, data: false}
+          end
+          render json: json, status: :ok
+      end
+  ```
 
 ### Get the status of an Order
 
@@ -161,70 +161,70 @@
 
 - Para produzir um _Batch_ precisamos receber a 'reference' do mesmo, ai iremos verificar se alguém ordem presente no _Batch_ está disponível para transitar do estado de 'production' para o de 'closing'.
 
-```ruby
-    def produce # Produce a Batch
-        if !params.include?(:reference) # Validation
-            return render json: {message:'No field reference', data: false}, status: :ok
-        end
-        batch = Batch.find_by(reference: params[:reference])
-        if batch == nil # did I found something?
-            return render json: {message:'No batch found', data: false}, status: :ok
-        end
-        orders = JSON.parse(batch.orders.to_s)
-        order_references = []
-        orders.each do |reference|
-            order = Order.find_by(reference: reference)
-            if order.status == 'production' # if was printed...
-                order.status = 'closing' # set already produced (closing)
-                order.save
-                order_references << order.reference
-            end
-        end
-        render json: {message:'Batch produced and returned orders references', data: order_references}, status: :ok
-    end
+  ```ruby
+      def produce # Produce a Batch
+          if !params.include?(:reference) # Validation
+              return render json: {message:'No field reference', data: false}, status: :ok
+          end
+          batch = Batch.find_by(reference: params[:reference])
+          if batch == nil # did I found something?
+              return render json: {message:'No batch found', data: false}, status: :ok
+          end
+          orders = JSON.parse(batch.orders.to_s)
+          order_references = []
+          orders.each do |reference|
+              order = Order.find_by(reference: reference)
+              if order.status == 'production' # if was printed...
+                  order.status = 'closing' # set already produced (closing)
+                  order.save
+                  order_references << order.reference
+              end
+          end
+          render json: {message:'Batch produced and returned orders references', data: order_references}, status: :ok
+      end
 
-```
+  ```
 
 ### Close part of a Batch for a Delivery Service
 
 - Para fechar um _Batch_ precisamos receber além da 'reference' o campo 'deliveryService', aí iremos verificar se alguma ordem presente no _Batch_ está disponível para transitar do estado de 'closing' para o de 'sent' além de ter o mesmo 'deliveryService' do informado pelo usuário. Isto significa que a ordem foi entregue pelo serviço de entrega.
 
-```ruby
- def close # Close part of a Batch for a Delivery Service
-        if !params.include?(:reference) # Validation
-            return render json: {message:'No field reference', data: false}, status: :ok
-        elsif !params.include?(:deliveryService)
-            return render json: {message:'No field deliveryService', data: false}, status: :ok
-        end
-        devileryService = params[:deliveryService]
-        batch = Batch.find_by(reference: params[:reference])
-        if batch == nil # did I found something?
-            return render json: {message:'No batch found', data: false}, status: :ok
-        end
-        orders = JSON.parse(batch.orders.to_s)
-        order_references = []
-        orders.each do |reference|
-            order = Order.find_by(reference: reference)
-            if order.deliveryService == devileryService && order.status == 'closing'
-                order.status = 'sent'
-                order.save
-                order_references << order.reference
-            end
-        end
-        render json: {message:'Batch closed and returned orders references', data: order_references}, status: :ok
-    end
-```
+  ```ruby
+   def close # Close part of a Batch for a Delivery Service
+          if !params.include?(:reference) # Validation
+              return render json: {message:'No field reference', data: false}, status: :ok
+          elsif !params.include?(:deliveryService)
+              return render json: {message:'No field deliveryService', data: false}, status: :ok
+          end
+          devileryService = params[:deliveryService]
+          batch = Batch.find_by(reference: params[:reference])
+          if batch == nil # did I found something?
+              return render json: {message:'No batch found', data: false}, status: :ok
+          end
+          orders = JSON.parse(batch.orders.to_s)
+          order_references = []
+          orders.each do |reference|
+              order = Order.find_by(reference: reference)
+              if order.deliveryService == devileryService && order.status == 'closing'
+                  order.status = 'sent'
+                  order.save
+                  order_references << order.reference
+              end
+          end
+          render json: {message:'Batch closed and returned orders references', data: order_references}, status: :ok
+      end
+  ```
 
 ### A simple financial report
 
 - O relatório financeiro é simplesmente um somatório de todas as ordens em aberto por canal de venda (Purchase Channel).
 
-```ruby
-    def financialReport # A simple financial report
-        report = Order.select("purchaseChannel, count(reference) as quantity, sum(totalValue) as total").where.not(status: 'sent').group('purchaseChannel')
-        render json: {message:'Financial Report', data: report}, status: :ok
-    end
-```
+  ```ruby
+      def financialReport # A simple financial report
+          report = Order.select("purchaseChannel, count(reference) as quantity, sum(totalValue) as total").where.not(status: 'sent').group('purchaseChannel')
+          render json: {message:'Financial Report', data: report}, status: :ok
+      end
+  ```
 
 ## Melhorias (Additional Stuff)
 
