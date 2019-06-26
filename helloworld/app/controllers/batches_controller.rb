@@ -2,8 +2,7 @@ require 'json'
 class BatchesController < ApplicationController
     include BatchesHelper
     def show
-        render json: definePKBatches()
-        # render json: {message:'Batch information', data: Batch.find_by(reference: params[:reference])}, status: :ok
+        render json: {message:'Batch information', data: Batch.find_by(reference: params[:reference])}, status: :ok
     end
 
     def showAll
@@ -17,15 +16,15 @@ class BatchesController < ApplicationController
 
         purchaseChannel = params[:purchaseChannel]
         # get all orders from this purchase channel
-        AllOrders = Order.select("deliveryService as ds, group_concat(reference) as refs").where(purchaseChannel: purchaseChannel, status: 'ready').group('deliveryService')
+        allOrders = Order.select("deliveryService as ds, group_concat(reference) as refs").where(purchaseChannel: purchaseChannel, status: 'ready').group('deliveryService')
 
-        if AllOrders.size == 0 || AllOrders == []
+        if allOrders.size == 0 || allOrders == []
             return render json: {message:"Has no order to create a batch for '#{purchaseChannel}''", data: false}, status: :ok
         end
         
         batches = []
         ## for every deliveryService will be create a new batch
-        AllOrders.each do |ordersByDelivery|
+        allOrders.each do |ordersByDelivery|
             batch = Batch.new
             batch.reference = definePKBatches()
             batch.purchaseChannel = purchaseChannel
