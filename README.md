@@ -2,7 +2,7 @@
 
 - Para criação desta API foi utilizado o Ruby on Rails na versão 5.
 - O banco de dados para desenvolvimento é o `sqlite3` e este por sua vez já esta configurado no repositório, porém em caso de colocar a API para produção recomenda-se um banco de dados como `MySQL` ou `Postgres` para colocar em produção.
-- O _schema_ final do banco de dados pode ser visualizado no aquivo [schema.rb](https://github.com/mcarujo/RailsHelloWorld/blob/master/helloworld/db/schema.rb), porém essa estrutura será abordada em um tópico aqui presente.
+- O _schema_ final do banco de dados pode ser visualizado no arquivo [schema.rb](https://github.com/mcarujo/RailsHelloWorld/blob/master/helloworld/db/schema.rb), porém essa estrutura será abordada em um tópico aqui presente.
 
 ## Instalação
 
@@ -57,8 +57,8 @@
 ### Um pouco mais detalhes (A few more details)
 
 - Sobre o primeiro ponto destacado, em nenhum momento da API criará alguma `batch` com `orders` de diferentes `Purchase Channel`, Nem na rota de criação e nem do `faker`, para mais detalhes convido a análise do método `create` presente no controller [orders_controller.rb](https://github.com/mcarujo/RailsHelloWorld/blob/master/helloworld/app/controllers/orders_controller.rb) e do arquivo [seeds.rb](https://github.com/mcarujo/RailsHelloWorld/blob/master/helloworld/db/seeds.rb).
-
-- Apenas as tabelas `orders` e `batches` foram criadas e utilizadas por mim. Qualquer outra tabela presente no banco de dados é utilizada pelo Ruby on Rails, para controle de versão do migrate ou pelo banco de dados para controle de sequencia de _primary key_.
+- Ao criar uma `batch`, primeiro se é agrupado todas as ordens encontradas para cada serviço de entrega presente, ou seja fazemos um 'group by' em cada serviço de entrega e um 'group concat' para as ordens, sendo assim criamos uma batch para cada serviço de entrega presente.
+- Apenas as tabelas `orders` e `batches` foram criadas e utilizadas por mim. Qualquer outra tabela presente no banco de dados é utilizada pelo Ruby on Rails, para controle de versão do migrate ou pelo banco de dados para controle de sequência de _primary key_.
 
 ## Ações (Actions)
 
@@ -93,7 +93,6 @@
           orders = cutInformationByStatus(orders) # clean the return
           render json: {message: 'Orders status by name', data: orders},status: :ok
       end
-
   ```
 
 ### Listar todas as Ordens por um Canal de Compra (List the Orders of a Purchase Channel)
@@ -119,43 +118,51 @@
 ### Criar um Lote (Create a Batch)
 
 - Para criar um novo Batch, precisamos receber uma requisição com o verbo `POST` na rota `/batch` com o campo 'purchaseChannel'. Ao receber a requisição,
-  verificamos se o campo está presente e após isso buscamos todas as _orders_ presentes com este 'purchaseChannel' que estão com o 'status' igual a 'ready' isto é, o pedido ou melhor a
-  _order_ está recém criada e pronta para ser produzida. Caso nenhuma _order_ seja encontrada, retornamos essa informação para o usuário, caso contrário geramos uma
-  'reference' para o novo _batch_ com o método do 'helper' chamado 'definePKBatches', marcamos todas as _orders_ encontradas como 'production' e salvamos estas em um array de `json` no campo 'orders'.
+  verificamos se o campo está presente primeiramente e após isso buscamos todas as _orders_ presentes com este 'purchaseChannel' que estão com o 'status' igual a 'ready' isto é, o pedido, a
+  _order_ está recém criada e pronta para ser produzida. Caso nenhuma _order_ seja encontrada, retornamos essa informação para o usuário, dividimos todas as orders presentes em um batch diferente para respeitar a diferença de prioridade de cada serviço de entrega,
+  sendo assim cada um tem um reference diferente, e no final retornamos todos os batches criados e o número de ordens presentes em cada batch.
 
   ```ruby
-     def create # Create a Batch
-        if !params.include?(:purchaseChannel) # Validation for name
-            return render json: {message: "No field purchaseChannel", data: false},status: :ok
-        end
+  def create # Create a Batch
+      if !params.include?(:purchaseChannel) # Validation for name
+          return render json: {message: "No field purchaseChannel", data: false},status: :ok
+      end
 
-        purchaseChannel = params[:purchaseChannel]
-        orders = Order.where(purchaseChannel: purchaseChannel, status: 'ready')
+      purchaseChannel = params[:purchaseChannel]
+      # get all orders from this purchase channel
+      AllOrders = Order.select("deliveryService as ds, group_concat(reference) as refs").where(purchaseChannel: purchaseChannel, status: 'ready').group('deliveryService')
 
-        if orders.size == 0
-            return render json: {message:"Has no order to create a batch for '#{purchaseChannel}''", data: false}, status: :ok
-        end
+      if AllOrders.size == 0 || AllOrders == []
+          return render json: {message:"Has no order to create a batch for '#{purchaseChannel}''", data: false}, status: :ok
+      end
 
-        batch = Batch.new
-        batch.reference = definePKBatches()
-        batch.purchaseChannel = purchaseChannel
+      batches = []
+      ## for every deliveryService will be create a new batch
+      AllOrders.each do |ordersByDelivery|
+          batch = Batch.new
+          batch.reference = definePKBatches()
+          batch.purchaseChannel = purchaseChannel
+          ordersLocal = ordersByDelivery.refs.split(',') # take all orders by delivery service like a Array
+          ordersReferences = []
+          ordersLocal.each do |order|
+              order = Order.find_by(reference: orderLocal)
+              order.status = 'production'
+              ordersReferences << order.reference
+              order.save
+          end
+          batch.orders = ordersReferences.to_json
+          if batch.save
+              batches << {reference: batch.reference, numOrders: ordersLocal.size}
+          end
+      end
 
-        ordersReferences = []
-        orders.each do |order|
-            order.status = 'production'
-            ordersReferences << order.reference
-            order.save
-        end
-
-        batch.orders = ordersReferences.to_json
-        if batch.save
-            json = {message:'Batch created', data: {reference: batch.reference, numOrders: orders.size}}
-        else
-            json = {message: batch.errors.full_messages, data: false}
-        end
-        render json: json, status: :ok
-    end
-
+      if batches.size != 0 || batches == []
+          json = {message:'Batch(es) created', data: batches }
+      else
+          json = {message: "For some reason, we can't create your batch, please contact us", data: false}
+      end
+      render json: json, status: :ok
+  end
   ```
 
 ### Produzir um Lote (Produce a Batch)
