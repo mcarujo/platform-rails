@@ -9,6 +9,17 @@
 - Partindo do pressuposto que você já tem um `ruby` instalado na sua máquina e tudo mais, você só precisará instalar todas as dependências do projeto com o comando `bundle install`. Além disso você precisa ter o banco de dados `sqlite3` instalado no servidor, você pode acessar informações para este procedimento nesse [link](https://www.sqlite.org/download.html).
 - Ao finalizar a instalação das dependências, você deve subir a estrutura do banco de dados pelo _migrate_, para isso você pode digitar o comando `rails db:migrate` dentro do diretório do projeto. Após isso você pode subir alguns dados fictícios para melhor visualização com o comando `rails db:seed`.
 
+## Usando
+
+- Após o procedimento de instalação totalmente concluído, você pode executar o comando `rails server` no diretório do seu projeto para subir um servidor de desenvolvimento, este estará rodando na porta padrão 3000, caso não tenha alterado a porta padrão é claro.
+  Ao executar o comando você por visualizar 3 telas simples apenas para orientação no seu navegador,
+  basta apenas digitar a clássica url [http://localhost:3000/](http://localhost:3000/).
+
+- A navegação da interface pode ser feita pelo navbar presente na parte superior da tela, nela as telas de Orders e Batches são simplesmente um espelho (Select) das tabelas no banco de dados.
+  Já a tela de Reports é a funcionalidade requisitada _a simple financial report_.
+
+- Já as rotas presentes na API estão disponivel para consulta no arquivo padrão [routes.rb](https://github.com/mcarujo/RailsHelloWorld/blob/master/helloworld/config/routes.rb).
+
 ## Entidades
 
 - Toda a estrutura de banco de dados foi feita com o `migrations` do RoR (Ruby on Rails). Ambas possuem uma _primary key_ chamada ID e duas tabelas chamadas _created_at_ e _updated_at_ que são atualizadas automaticamente, sendo o padrão na estrutura do migrate do RoR, e isto não foi alterado. A validação dos dados estão presente na camada de Model da API, sendo estes os arquivos [order.rb](https://github.com/mcarujo/RailsHelloWorld/blob/master/helloworld/app/models/order.rb) e [batch.rb](https://github.com/mcarujo/RailsHelloWorld/blob/master/helloworld/app/models/batch.rb).
