@@ -4,6 +4,9 @@
 - O banco de dados para desenvolvimento é o `sqlite3` e este por sua vez já esta configurado no repositório, porém em caso de colocar a API para produção recomenda-se um banco de dados como `MySQL` ou `Postgres` para colocar em produção.
 - O _schema_ final do banco de dados pode ser visualizado no arquivo [schema.rb](https://github.com/mcarujo/RailsHelloWorld/blob/master/helloworld/db/schema.rb), porém essa estrutura será abordada em um tópico aqui presente.
 
+![Gif](https://github.com/mcarujo/RailsHelloWorld/blob/master/rubyonrails.gif)
+
+
 ## Instalação
 
 - Partindo do pressuposto que você já tem um `ruby` instalado na sua máquina e tudo mais, você só precisará instalar todas as dependências do projeto com o comando `bundle install`. Além disso você precisa ter o banco de dados `sqlite3` instalado no servidor, você pode acessar informações para este procedimento nesse [link](https://www.sqlite.org/download.html).
